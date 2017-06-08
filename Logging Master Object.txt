@@ -1,0 +1,23 @@
+Setup:
+* Set '&DB_LOG' to the DBref of the Logging Parent Object.
+* Place the Logging Master Object into the Master Room.
+
+@create Logging Master Object=10
+
+&CMD-LOG-ON Logging Master Object=$+log/on *:@pemit %#=<Log> [switch(0,t(setr(0,locate(%#,%0,Tn))),Error: [if(match(#-1,%q0),Cannot find '%0' in the room with you.,Which '%0' do you mean?)],match(parent(%q0),v(db_log)),Error: [name(%q0)] is not a logging object.,controls(%#,%q0),Error: You don't control [name(%q0)].,not(hasattr(%q0,mon_log)),Error: [name(%q0)] is already logging.,[name(%q0)] starts logging the current scene.[set(%q0,mon_log:^[get(%q0/do_log)])])]
+
+&CMD-LOG-OFF Logging Master Object=$+log/off *:@pemit %#=<Log> [switch(0,t(setr(0,locate(%#,%0,Tn))),Error: [if(match(#-1,%q0),Cannot find '%0' in the room with you.,Which '%0' do you mean?)],match(parent(%q0),v(db_log)),Error: [name(%q0)] is not a logging object.,controls(%#,%q0),Error: You don't control [name(%q0)].,hasattr(%q0,mon_log),Error: [name(%q0)] is not logging.,[name(%q0)] stops logging the current scene.[wipe(%q0/mon_log)] )]
+
+&CMD-LOG-SHOW Logging Master Object=$+log/show *:@pemit %#=<Log> [switch(0,t(setr(0,locate(%#,%0,Ti))),Error: [if(match(#-1,%q0),Cannot find '%0' in your inventory.,Which '%0' do you mean?)],match(parent(%q0),v(db_log)),Error: [name(%q0)] is not a logging object.,controls(%#,%q0),Error: You don't control [name(%q0)].,attrcnt(%q0/pose_*),[name(%q0)] has not logged any poses.,All poses [name(%q0)] has logged:%r[trigger(%!/trig_log-show,%#,%q0)] )]
+
+&TRIG_LOG-SHOW Logging Master Object=@dolist lattr(%1/pose_*)=@pemit %0=u(%1/##)[repeat(%r,udefault(%0/log_lines,2))];@if %2=@pemit %0=\}\}
+
+&CMD-LOG-WIPE Logging Master Object=$+log/wipe *:@pemit %#=<Log> [switch(0,t(setr(0,locate(%#,%0,Tin))),Error: [if(match(#-1,%q0),Cannot find '%0' in the room with you or in your inventory.,Which '%0' do you mean?)],match(parent(%q0),v(db_log)),Error: [name(%q0)] is not a logging object.,or(isstaff(%#),match(owner(%q0),%#)),Error: You don't own [name(%q0)].,attrcnt(%q0/pose_*),[name(%q0)] has not logged any poses.,You erase all poses [name(%q0)] has logged.[wipe(%q0/pose_*)] )]
+
+&CMD-LOG-SETUP Logging Master Object=$+log/setup *:@pemit %#=<Log> [switch(0,t(setr(0,locate(%#,%0,Tni))),Error: [if(match(#-1,%q0),Cannot find '%0' in the room with you or in your inventory.,Which '%0' do you mean?)],controls(%#,%q0),Error: You don't control [name(%q0)].,not(match(v(db_log),parent(%q0))),Error: [name(%q0)] is already a logging object.,You turn [name(%q0)] into a logging object.[parent(%q0,v(db_log))][set(%q0,monitor)])]
+
+&CMD-LOG-RETURN Logging Master Object=$+log/return *:@switch 0=t(setr(0,locate(%#,%0,Tn))),{@pemit %#=<Log> Error: [if(match(#-1,%q0),Cannot find '%0' in the room with you.,Which '%0' do you mean?)]},match(parent(%q0),v(db_log)),{@pemit %#=<Log> Error: [name(%q0)] is not a logging object.},{@pemit %#=You return [name(%q0)] to its owner.;@tel %q0=owner(%q0);&mon_log %q0=;@mail/quick owner(%q0)/%cc%chLog Returned%cn=%k has returned your log%, [name(%q0)]%, to your inventory. Please post this log when possible.}
+
+&CMD-LOG-RE Logging Master Object=$+log/re *=*:@pemit %#=<Log> [switch(0,t(setr(0,locate(%#,%0,Tn))),Error: [switch(%q0,#-1,Cannot find '%0' in the room with you.,Which '%0' do you mean?)],match(parent(%q0),v(db_log))[setq(n,name(%q0))],Error: %qn is not a logging object.,and(isint(%1),gt(%1,0)),Error: Pose number must be an integer of at least 1.,eq(%1,setr(1,min(%1,attrcnt(%q0/pose_*))))[setq(2,revwords(lattr(%q0/pose_*)))],%qn has not logged %1 poses. Instead showing all %q1:%r%r[iter(lnum(%q1,1),get(%q0/[elements(%q2,%i0)]),,%r[repeat(%r,udefault(%#/log_lines,2))])],Showing the last %1 poses from %qn:%r%r[iter(lnum(%q1,1),get(%q0/[elements(%q2,%i0)]),,%r[repeat(%r,udefault(%#/log_lines,2))])] )]
+
+@set Logging Master Object=INHERIT

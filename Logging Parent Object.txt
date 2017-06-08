@@ -1,0 +1,7 @@
+@create Logging Parent Object=10
+
+&DO_LOG Logging Parent Object=*:@if not(or(and(strmatch(first(%0),<*>),or(not(strmatch(first(%0),<OOC>)),not(v(log_ooc)))),strmatch(first(%0),%r<*>),lor(iter(exit enter,strmatch(last(%0),<%i0>))),lor(iter(has arrived.|has left.|has connected.|has disconnected.|has reconnected.|has partially disconnected.|grows ears and can now hear.|loses its ears and becomes deaf.|goes home.,strmatch(%0,%N %i0),|))))={@set %!=Pose_[inc(last(last(lattr(%!/pose_*)),_))]:%0}
+
+@Desc Logging Parent Object=This is a logger object. The log is currently [if(hasattr(%!,mon_log),%cg%chON%cn,%cr%chOFF%cn)] and has logged [attrcnt(%!/pose_*)] pose[if(neq(1,attrcnt(%!/pose_*)),s)].%r%rTo return the log to its owner, type %cc%ch+log/return [name(%!)]%cn.
+
+@set Logging Parent Object=PARENT_OK
